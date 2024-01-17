@@ -7,6 +7,3 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255)
 );
-
--- Additional comment: 
--- Making the 'email' attribute unique directly in the table schema enforces business rules and avoids application bugs.
