@@ -1,3 +1,4 @@
+-- File: task0
 -- Write a SQL script that creates a table users
 CREATE TABLE IF NOT EXISTS users (
 	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
