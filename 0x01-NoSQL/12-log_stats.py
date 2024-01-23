@@ -19,7 +19,7 @@ with MongoClient() as client:
 
     print("Methods:")
     for method, count in method_counts.items():
-        print(f"    method {method}: {count}")
+        print(f"\tmethod {method}: {count}")
 
     status_check_count = collection.count_documents({
         "method": "GET", "path": "/status"
