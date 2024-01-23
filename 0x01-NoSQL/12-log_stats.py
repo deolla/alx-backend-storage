@@ -2,6 +2,7 @@
 """A Python script that provides stats about Nginx logs stored in MongoDB"""
 from pymongo import MongoClient
 
+
 # Connect to MongoDB
 client = MongoClient()
 db = client.logs
