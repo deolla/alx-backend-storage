@@ -1,42 +1,28 @@
 #!/usr/bin/env python3
-"""Top student"""
-from pymongo import MongoClient
+"""A Python function that returns all students sorted by average score"""
 
 
 def top_students(mongo_collection):
-    pipeline = [
-        {
-            "$unwind": "$scores"
-        },
-        {
-            "$group": {
-                "_id": "$_id",  # Group by student ID
-                "averageScore": {"$avg": "$scores.score"}
-            }
-        },
-        {
-            "$lookup": {
-                "from": "students",
-                "localField": "_id",
-                "foreignField": "_id",
-                "as": "student_info"
-            }
-        },
-        {
-            "$unwind": "$student_info"
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "student_id": "$_id",
-                "name": "$student_info.name",
-                "averageScore": 1
-            }
-        },
-        {
-            "$sort": {"averageScore": -1}
-        }
-    ]
-
-    result = list(mongo_collection.aggregate(pipeline))
-    return result
+    students = mongo_collection.find()
+    student_scores = []
+    
+    for student in students:
+        if 'scores' in student:
+            scores = student['scores']
+            average_score = sum(score['score'] for score in scores) / len(scores)
+            student_scores.append((student['_id'], student['name'], scores, average_score))
+    sorted_students = sorted(student_scores, key=lambda x: x[3], reverse=True)
+    
+    for student in sorted_students:
+        student_id = student[0]
+        student_name = student[1]
+        scores = student[2]
+        average_score = student[3]
+        print(f"[{student_id}] {student_name} - {scores}")
+    
+    for student in sorted_students:
+        student_id = student[0]
+        student_name = student[1]
+        average_score = student[3]
+        print(f"[{student_id}] {student_name} => {average_score}")
+    return sorted_students
