@@ -1,4 +1,4 @@
-#!/usr/bin/env/ python3
+#!/usr/bin/env python3
 """A Python function that inserts new document in collection based on kwargs"""
 
 
