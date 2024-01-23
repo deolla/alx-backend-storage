@@ -14,11 +14,18 @@ def top_students(mongo_collection):
         student['averageScore'] = average_score
 
     # Sort the students by average score in descending order
-    sorted_students = sorted(students, key=lambda x: x['averageScore'], reverse=True)
+    sorted_students = sorted(
+        students,
+        key=lambda x: x['averageScore'],
+        reverse=True
+    )
 
     # Print the sorted students and their scores
     for student in sorted_students:
-        print("[{}] {} - {}".format(student['_id'], student['name'], student['topics']))
+        student_id = student['_id']
+        student_name = student['name']
+        student_topics = student['topics']
+        print("[{}] {} - {}".format(student_id, student_name, student_topics))
 
     # Return the sorted students
     return sorted_students
