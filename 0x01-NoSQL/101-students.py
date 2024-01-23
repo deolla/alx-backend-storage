@@ -3,7 +3,7 @@
 
 
 def top_students(mongo_collection):
-    # Find all documents in the collection
+    """Find all documents in the collection"""
     students = mongo_collection.find()
 
     # Calculate the average score for each student
