@@ -1,34 +1,30 @@
 #!/usr/bin/env python3
 """A Python function that returns all students sorted by average score"""
-import operator
+
+from pymongo import MongoClient
+
 
 def top_students(mongo_collection):
     """Returns all students sorted by average score"""
-    students = []
+    students = mongo_collection.find()
 
-    coll = mongo_collection.find()
-    for document in coll:
-        if "scores" not in document:
-            continue
+    student_scores = []
 
-        scores = document["scores"]
+    for student in students:
+        if 'topics' in student:
+            scores = [topic.get('score', 0) for topic in student['topics']]
+            average_score = sum(scores) / len(scores) if len(scores) > 0 else 0
+            student_scores.append({
+                '_id': student.get('_id'),
+                'name': student.get('name'),
+                'topics': student.get('topics'),
+                'averageScore': average_score
+            })
 
-        if not isinstance(scores, list):
-            continue
+    sorted_students = sorted(
+        student_scores,
+        key=lambda x: x['averageScore'],
+        reverse=True
+    )
 
-        if len(scores) == 0:
-            continue
-
-        average_score = sum(score["score"] for score in scores) / len(scores)
-
-        student_info = {
-            "name": document["name"],
-            "averageScore": average_score
-        }
-
-        students.append(student_info)
-
-    students.sort(key=operator.itemgetter("averageScore"), reverse=True)
-
-    sorted_student_names = [student["name"] for student in students]
-    return sorted_student_names
+    return sorted_students
