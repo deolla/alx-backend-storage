@@ -6,35 +6,35 @@ from pymongo import MongoClient
 def top_students(mongo_collection):
     pipeline = [
         {
-            "$unwind": "$scores"  # Unwind the scores array to get separate documents for each score
+            "$unwind": "$scores"
         },
         {
             "$group": {
                 "_id": "$_id",  # Group by student ID
-                "averageScore": {"$avg": "$scores.score"}  # Calculate the average score
+                "averageScore": {"$avg": "$scores.score"}
             }
         },
         {
             "$lookup": {
-                "from": "students",  # Assuming the collection name is "students"
+                "from": "students",
                 "localField": "_id",
                 "foreignField": "_id",
                 "as": "student_info"
             }
         },
         {
-            "$unwind": "$student_info"  # Unwind the student_info array
+            "$unwind": "$student_info"
         },
         {
             "$project": {
-                "_id": 0,  # Exclude the default _id field
+                "_id": 0,
                 "student_id": "$_id",
                 "name": "$student_info.name",
                 "averageScore": 1
             }
         },
         {
-            "$sort": {"averageScore": -1}  # Sort by averageScore in descending order
+            "$sort": {"averageScore": -1}
         }
     ]
 
