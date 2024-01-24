@@ -35,24 +35,28 @@ def call_history(method: Callable) -> Callable:
 
 
 def replay(method: Callable) -> None:
-    """Implement a replay function to display the history of calls."""
-    inputs_key = f"{method.__qualname__}:inputs"
-    outputs_key = f"{method.__qualname__}:outputs"
+    """
+    Replays the history of a function
+    Args:
+        method: The function to be decorated
+    Returns:
+        None
+    """
+    name = method.__qualname__
     cache = redis.Redis()
-
-    inputs_history = cache.lrange(inputs_key, 0, -1)
-    outputs_history = cache.lrange(outputs_key, 0, -1)
-
-    print(f"{method.__qualname__} was called {len(inputs_history)} times:")
-    for input_arg, output_key in zip(inputs_history, outputs_history):
-        input_args_str = input_arg.decode("utf-8")
-        output_key_str = output_key.decode("utf-8")
-        print(f"{method.__qualname__}(*{input_args_str}) -> {output_key_str}")
+    calls = cache.get(name).decode("utf-8")
+    print("{} was called {} times:".format(name, calls))
+    inputs = cache.lrange(name + ":inputs", 0, -1)
+    outputs = cache.lrange(name + ":outputs", 0, -1)
+    for i, o in zip(inputs, outputs):
+        print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
+                                     o.decode('utf-8')))
 
 
 class Cache:
+    """Create a Cache class"""
     def __init__(self) -> None:
-        """Create a Cache class."""
+        """ Instantialisation of class."""
         self._redis = redis.Redis()
         self._redis.flushdb()
 
