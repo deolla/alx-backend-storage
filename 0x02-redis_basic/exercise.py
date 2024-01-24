@@ -4,6 +4,7 @@ import redis
 import uuid
 from typing import Union, Callable, Optional
 
+
 class Cache:
     def __init__(self) -> None:
         """Create a Cache class."""
@@ -16,7 +17,11 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Optional[Callable[[bytes], Union[str, int, float]]] = None) -> Union[str, bytes, int, float, None]:
+    def get(
+        self,
+        key: str,
+        fn: Optional[Callable[[bytes], Union[str, int, float]]] = None
+    ) -> Union[str, bytes, int, float, None]:
         """Retrieves data from Redis based on the key."""
         data = self._redis.get(key)
         if data is not None and fn is not None:
