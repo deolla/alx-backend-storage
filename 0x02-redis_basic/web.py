@@ -1,36 +1,54 @@
 #!/usr/bin/env python3
-"""Implement a get_page function"""
+"""In this tasks, we will implement a get_page function
+(prototype: def get_page(url: str) -> str:). The core of
+the function is very simple. It uses the requests module
+to obtain the HTML content of a particular URL and returns it.
 
-import requests
+Start in a new file named web.py and do not reuse the code
+written in exercise.py.
+
+Inside get_page track how many times a particular URL was
+accessed in the key "count:{url}" and cache the result with
+an expiration time of 10 seconds.
+
+Tip: Use http://slowwly.robertomurray.co.uk to simulate
+a slow response and test your caching."""
+
+
 import redis
+import requests
 from functools import wraps
-from typing import Callable
 
 r = redis.Redis()
 
 
-def count_requests(method: Callable) -> Callable:
-    """Count the number of requests"""
-
+def url_access_count(method):
+    """decorator for get_page function"""
     @wraps(method)
     def wrapper(url):
-        """Wrapper function for decorator"""
-        r.incr(f"count:{url}")
-        caches = r.get(f"cached:{url}")
-        if caches:
-            return caches.decode("utf-8")
-        html = method(url)
-        r.setex(f"cached:{url}", 10, html)
-        return html
+        """wrapper function"""
+        key = "cached:" + url
+        cached_value = r.get(key)
+        if cached_value:
+            return cached_value.decode("utf-8")
 
+            # Get new content and update cache
+        key_count = "count:" + url
+        html_content = method(url)
+
+        r.incr(key_count)
+        r.set(key, html_content, ex=10)
+        r.expire(key, 10)
+        return html_content
     return wrapper
 
 
-@count_requests
+@url_access_count
 def get_page(url: str) -> str:
-    """Get the HTML content of a particular URL and returns it"""
-    req = requests.get(url)
-    return req.text
+    """obtain the HTML content of a particular"""
+    results = requests.get(url)
+    return results.text
+
 
 if __name__ == "__main__":
     get_page('http://slowwly.robertomurray.co.uk')
