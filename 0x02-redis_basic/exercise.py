@@ -2,23 +2,25 @@
 """Create a Cache class"""
 import redis
 import uuid
-from typing import Union, Callable, Optional
+from typing import Callable, Optional, Union
 from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
     """Count how many times methods of the Cache class are called."""
+
     @warps(method)
     def wrapper(self, *args, **kwargs):
         """Decorator to count how many times a method is called."""
         key = method.__qualname__
-        self._redis.incur(key)
+        self._redis.incr(key)
         return method(self, *args, **kwargs)
     return wrapper
 
 
 def call_history(method: Callable) -> Callable:
     """Store the history of inputs & outputs for a particular function."""
+
     @warps(method)
     def wrapper(self, *args, **kwargs):
         """Create input and output list keys using the qualified name."""
