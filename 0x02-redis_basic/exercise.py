@@ -13,8 +13,8 @@ def count_calls(method: Callable) -> Callable:
         """Decorator to count how many times a method is called."""
         key = method.__qualname__
         self._redis.incur(key)
-        return methos(self, *args, **kwargs)
-    return warpper
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 def call_history(method: Callable) -> Callable:
