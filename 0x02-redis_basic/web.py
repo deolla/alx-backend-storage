@@ -34,5 +34,10 @@ def count_url_access(method):
 @count_url_access
 def get_page(url: str) -> str:
     """Returns HTML content of a url"""
-    res = requests.get(url)
-    return res.text
+    try:
+        res = requests.get(url)
+        return res.text
+    except (ConnectionError, MaxRetryError) as e:
+        print(f"Error accessing URL: {e}")
+        return "Error: Unable to access the URL"
+
