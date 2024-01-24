@@ -2,8 +2,11 @@
 """Implementation of an expiring web cache and tracker."""
 import redis
 import requests
+import time
 from typing import Callable
 from functools import wraps
+
+redis_ = redis.StrictRedis()
 
 
 def count_sessions(method: Callable) -> Callable:
@@ -24,11 +27,11 @@ def count_sessions(method: Callable) -> Callable:
         Returns:
             str: [description]
         """
-        redis.incr(f"count:{url}")
-        cache = redis.get(f"cached:{url}")
+        redis_.incr(f"count:{url}")
+        cache = redis_.get(f"cached:{url}")
         if not cache:
             cache = method(url)
-            redis.setex(f"cached:{url}", 10, cache)
+            redis_.setex(f"cached:{url}", 10, cache)
         return cache
 
     return wrapper
@@ -43,5 +46,21 @@ def get_page(url: str) -> str:
     Returns:
         str: [description]
     """
-    req = requests.get(url)
-    return req.text
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            req = requests.get(url)
+            return req.text
+        except requests.exceptions.ConnectionError as e:
+            print(f"Error accessing URL: {e}")
+            if attempt < max_retries - 1:
+                print(f"Retrying in 2 seconds (attempt {attempt + 2}/{max_retries})...")
+                time.sleep(2)
+            else:
+                print("Max retries exceeded. Unable to access the URL.")
+                return "Error: Unable to access the URL"
+
+
+slow_url = "https://www.ilovepdf."
+print(get_page(slow_url))
+print(redis_.get(f"count:{slow_url}"))
