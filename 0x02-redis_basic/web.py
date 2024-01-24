@@ -6,6 +6,8 @@ import redis
 import requests
 from typing import Callable
 
+store = redis.Redis()
+
 
 def count_url_access(method):
     """Decorator counting how many times
