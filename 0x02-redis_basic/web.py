@@ -6,9 +6,6 @@ from typing import Callable
 from functools import wraps
 
 
-redis = redis.Redis()
-
-
 def count_sessions(method: Callable) -> Callable:
     """
     Decorator that counts how many requests have been made.
@@ -48,7 +45,3 @@ def get_page(url: str) -> str:
     """
     req = requests.get(url)
     return req.text
-
-
-url = "http://slowwly.robertomurray.co.uk"
-print(get_page(url))
