@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
-"""Implement a get_page function"""
+""" Redis Module """
 
-import requests
-import redis
 from functools import wraps
+import redis
+import requests
 from typing import Callable
 
-r = redis.Redis()
+redis_ = redis.Redis()
 
 
 def count_requests(method: Callable) -> Callable:
-    """Count the number of requests"""
+    """Decortator for counting"""
 
     @wraps(method)
-    def wrapper(url):
-        """Wrapper function for decorator"""
-        r.incr(f"count:{url}")
-        caches = r.get(f"cached:{url}")
-        if caches:
-            return caches.decode("utf-8")
+    def wrapper(url):  # sourcery skip: use-named-expression
+        """Wrapper for decorator"""
+        redis_.incr(f"count:{url}")
+        cached_html = redis_.get(f"cached:{url}")
+        if cached_html:
+            return cached_html.decode("utf-8")
         html = method(url)
-        r.setex(f"cached:{url}", 10, html)
+        redis_.setex(f"cached:{url}", 10, html)
         return html
 
     return wrapper
@@ -28,6 +28,6 @@ def count_requests(method: Callable) -> Callable:
 
 @count_requests
 def get_page(url: str) -> str:
-    """Get the HTML content of a particular URL and returns it"""
+    """Obtain the HTML content of a  URL"""
     req = requests.get(url)
     return req.text
