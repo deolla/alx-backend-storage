@@ -6,23 +6,42 @@ from typing import Callable
 from functools import wraps
 
 
-def count_requests(method: Callable) -> Callable:
-    """Decorator that counts how many requests have been made."""
+def count_sessions(method: Callable) -> Callable:
+    """
+    Decorator that counts how many requests have been made.
+    Args:
+        method (Callable): [description]
+    Returns:
+        Callable: [description]
+    """
 
     @wraps(method)
     def wrapper(url):
-        """Wrapper function for decorator."""
+        """
+        Wrapper function for decorator.
+        Args:
+            url (str): [description]
+        Returns:
+            str: [description]
+        """
         redis.incr(f"count:{url}")
-        page = redis.get(f"cached:{url}")
-        if not page:
-            page = method(url)
-            redis.setex(f"cached:{url}", 10, page)
-        return page
+        cache = redis.get(f"cached:{url}")
+        if not cache:
+            cache = method(url)
+            redis.setex(f"cached:{url}", 10, cache)
+        return cache
 
     return wrapper
 
 
-@count_requests
+@count_sessions
 def get_page(url: str) -> str:
-    """Gets the HTML content of a web page."""
-    return requests.get(url).text
+    """
+    Gets the HTML content of a web page.
+    Args:
+        url (str): [description]
+    Returns:
+        str: [description]
+    """
+    req = requests.get(url)
+    return req.text
