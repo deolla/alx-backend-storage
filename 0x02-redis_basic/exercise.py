@@ -36,21 +36,24 @@ def call_history(method: Callable) -> Callable:
 
 def replay(method: Callable) -> None:
     """
-    Replays the history of a function
+    Implement a replay function to display the history of calls.
     Args:
-        method: The function to be decorated
+        methods: function to decorate
     Returns:
         None
     """
-    name = method.__qualname__
+    inputs_key = f"{method.__qualname__}:inputs"
+    outputs_key = f"{method.__qualname__}:outputs"
     cache = redis.Redis()
-    calls = cache.get(name).decode("utf-8")
-    print("{} was called {} times:".format(name, calls))
-    inputs = cache.lrange(name + ":inputs", 0, -1)
-    outputs = cache.lrange(name + ":outputs", 0, -1)
-    for i, o in zip(inputs, outputs):
-        print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
-                                     o.decode('utf-8')))
+
+    inputs_history = cache.lrange(inputs_key, 0, -1)
+    outputs_history = cache.lrange(outputs_key, 0, -1)
+
+    print(f"{method.__qualname__} was called {len(inputs_history)} times:")
+    for input_arg, output_key in zip(inputs_history, outputs_history):
+        input_args_str = input_arg.decode("utf-8")
+        output_key_str = output_key.decode("utf-8")
+        print(f"{method.__qualname__}(*{input_args_str}) -> {output_key_str}")
 
 
 class Cache:
