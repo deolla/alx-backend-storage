@@ -16,6 +16,7 @@ def count_calls(method: Callable) -> Callable:
         return methos(self, *args, **kwargs)
     return warpper
 
+
 def call_history(method: Callable) -> Callable:
     """Store the history of inputs & outputs for a particular function."""
     def wrapper(*args, **kwargs):
