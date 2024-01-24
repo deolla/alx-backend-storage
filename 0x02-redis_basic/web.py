@@ -51,6 +51,4 @@ def get_page(url: str) -> str:
 
 
 url = "http://slowwly.robertomurray.co.uk"
-print(get_page(url))  # Fetches from URL
-# print(get_page(url))
-# print(get_page(url))
+print(get_page(url))
