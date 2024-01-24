@@ -9,7 +9,7 @@ from functools import wraps
 def count_calls(method: Callable) -> Callable:
     """Count how many times methods of the Cache class are called."""
 
-    @warps(method)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """Decorator to count how many times a method is called."""
         key = method.__qualname__
