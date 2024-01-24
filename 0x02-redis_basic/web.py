@@ -31,3 +31,6 @@ def get_page(url: str) -> str:
     """Get the HTML content of a particular URL and returns it"""
     req = requests.get(url)
     return req.text
+
+if __name__ == "__main__":
+    get_page('http://slowwly.robertomurray.co.uk')
